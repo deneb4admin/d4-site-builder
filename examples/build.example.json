@@ -1,0 +1,12 @@
+{
+  "$comment": "Example build config for d4-site-builder. Run: node bin/assemble.mjs --config this-file.json",
+  "siteName": "Acme Fabrication",
+  "tagline": "Precision metal fabrication for the Midwest.",
+  "description": "Acme Fabrication delivers custom metal work for industrial clients across the region, from one-off prototypes to production runs.",
+  "contactEmail": "info@acmefab.example",
+  "phone": "(555) 555-0100",
+  "address": "100 Industrial Way, Springfield",
+  "themePreset": "slate-teal",
+  "modules": ["d4-cms-core", "d4-careers-portal", "d4-gallery-editor"],
+  "output": "./acme-fabrication"
+}

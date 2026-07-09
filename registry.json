@@ -1,0 +1,48 @@
+{
+  "$comment": "The closed menu of D4 modules. An agent matching a client brief scans this file first, then reads the manifest.json of each module it intends to select. Order here is the deterministic assembly order.",
+  "schemaVersion": 1,
+  "modules": [
+    {
+      "name": "d4-site-template",
+      "kind": "site",
+      "repo": "https://github.com/deneb4admin/d4-site-template",
+      "summary": "Base Next.js site shell: layout, nav slots, home/about/contact, theme tokens. Always included.",
+      "alwaysIncluded": true
+    },
+    {
+      "name": "d4-cms-core",
+      "kind": "core",
+      "repo": "https://github.com/deneb4admin/d4-cms-core",
+      "summary": "Admin shell at /admin: password + optional TOTP login, dashboard, JSON data store, image upload. Required by every content module.",
+      "alwaysIncluded": false
+    },
+    {
+      "name": "d4-careers-portal",
+      "kind": "feature",
+      "repo": "https://github.com/deneb4admin/d4-careers-portal",
+      "summary": "Careers page with job postings and application forms, managed from the dashboard.",
+      "alwaysIncluded": false
+    },
+    {
+      "name": "d4-insights-blog",
+      "kind": "feature",
+      "repo": "https://github.com/deneb4admin/d4-insights-blog",
+      "summary": "Blog or news section written in markdown from the dashboard.",
+      "alwaysIncluded": false
+    },
+    {
+      "name": "d4-catalog",
+      "kind": "feature",
+      "repo": "https://github.com/deneb4admin/d4-catalog",
+      "summary": "Product or service catalog with categories, specs, and images, managed from the dashboard.",
+      "alwaysIncluded": false
+    },
+    {
+      "name": "d4-gallery-editor",
+      "kind": "feature",
+      "repo": "https://github.com/deneb4admin/d4-gallery-editor",
+      "summary": "Image galleries managed from the dashboard, with an embeddable Gallery component. Standalone from the catalog.",
+      "alwaysIncluded": false
+    }
+  ]
+}

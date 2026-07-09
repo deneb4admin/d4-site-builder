@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/deneb4admin/d4-site-builder/main/schema/manifest.schema.json",
+  "title": "D4 module manifest",
+  "description": "Machine-readable contract every D4 module repo carries at its root as manifest.json. d4-site-builder reads these to assemble client sites.",
+  "type": "object",
+  "required": ["name", "version", "kind", "description", "provides", "copy"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": {
+      "type": "string",
+      "pattern": "^d4-[a-z0-9-]+$",
+      "description": "Module name, matching the repo name."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semver version of this module."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["site", "core", "feature"],
+      "description": "site: the base template. core: infrastructure other modules depend on. feature: a selectable site feature."
+    },
+    "description": {
+      "type": "string",
+      "description": "Technical description, written for an agent matching modules to a client brief."
+    },
+    "clientFacingSummary": {
+      "type": "string",
+      "description": "Plain-language summary usable in a client proposal."
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Terms a client brief might use that should select this module."
+    },
+    "requires": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Module name to semver range, e.g. {\"d4-cms-core\": \">=1.0.0\"}. The builder auto-includes required modules."
+    },
+    "optionalIntegrations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Modules this one enhances when present but does not need."
+    },
+    "provides": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["routes", "nav", "adminPanels", "collections"],
+      "properties": {
+        "routes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "URL paths this module adds. Two selected modules must not provide the same route."
+        },
+        "nav": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["label", "href"],
+            "additionalProperties": false,
+            "properties": {
+              "label": { "type": "string" },
+              "href": { "type": "string" }
+            }
+          },
+          "description": "Nav entries the builder writes into src/config/nav.generated.ts."
+        },
+        "adminPanels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "label", "importPath"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "importPath": {
+                "type": "string",
+                "description": "Alias import path of a client component default export, e.g. @/modules/careers/admin/CareersEditor."
+              }
+            }
+          },
+          "description": "Dashboard panels the builder writes into src/config/admin-panels.generated.tsx. Requires d4-cms-core."
+        },
+        "collections": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Names of data collections (data/<name>.json) this module reads and writes."
+        },
+        "lib": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Importable paths this module offers to other modules or custom pages."
+        }
+      }
+    },
+    "env": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "required", "description"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "required": { "type": "boolean" },
+          "description": { "type": "string" }
+        }
+      },
+      "description": "Environment variables the module reads. The builder writes these into the assembled site's .env.example."
+    },
+    "npmDependencies": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Package name to version range, merged into the assembled site's package.json dependencies."
+    },
+    "npmDevDependencies": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Merged into devDependencies."
+    },
+    "copy": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["from", "to"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "type": "string", "description": "Directory in the module repo, usually \"files\"." },
+          "to": { "type": "string", "description": "Destination relative to the site root, usually \".\"." }
+        }
+      },
+      "description": "Copy steps the builder performs, in order."
+    },
+    "postAssemble": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "generatedFiles": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notes": { "type": "string" }
+      },
+      "description": "Free-form notes for humans and agents about what happens after copying."
+    }
+  }
+}
