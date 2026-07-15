@@ -29,7 +29,9 @@ You may read each candidate module's `manifest.json` (in its repo root) for its 
 
 Copy `examples/build.example.json` and fill it in with the client's facts and module list. Set `output` to a directory that does not exist yet.
 
-Theme: pick `themePreset` from `slate-teal`, `warm-sand`, or `ink-indigo`, or pass a `theme` object of CSS variable names to space-separated RGB channel values for a custom palette.
+**Pairing (design identity):** set `pairing` to an id from `pairings.json` — the closed menu of design pairing sets. Each pairing bundles a font pairing, a motion signature, and a fallback palette that are known to work together; read each pairing's `label`, `voice`, `for`, and `avoidFor` fields to match the client's business type and stated vibe, and pick the SINGLE best fit. Never mix parts from different pairings; the pairing is chosen whole, by id. When nothing in the client's answers points anywhere specific, use `modern-signal`.
+
+Theme: an explicit `theme` object (e.g. from brand ingest of the client's real colors) or a `themePreset` (`slate-teal`, `warm-sand`, `ink-indigo`) overrides the pairing's fallback palette. When neither is given, the pairing's own validated palette applies. Fonts and motion always come from the pairing regardless of theme.
 
 ## Assemble
 

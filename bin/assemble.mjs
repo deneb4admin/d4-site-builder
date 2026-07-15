@@ -53,6 +53,19 @@ const modulesDir = argValue("--modules-dir");
 // ── Inputs ─────────────────────────────────────────────────────────────
 const config = readJson(path.resolve(configPath), "Build config");
 const registry = readJson(path.join(ROOT, "registry.json"), "registry.json");
+const pairingsFile = readJson(path.join(ROOT, "pairings.json"), "pairings.json");
+
+let pairing = null;
+if (config.pairing) {
+  pairing = pairingsFile.pairings.find((p) => p.id === config.pairing);
+  if (!pairing) {
+    fail(
+      `Unknown pairing "${config.pairing}". pairings.json is the closed menu; options: ${pairingsFile.pairings
+        .map((p) => p.id)
+        .join(", ")}.`
+    );
+  }
+}
 
 const outDir = path.resolve(config.output ?? fail("Build config needs \"output\": a directory path."));
 if (!config.siteName) fail('Build config needs "siteName".');
@@ -273,6 +286,8 @@ if (config.theme && typeof config.theme === "object") {
 } else if (config.themePreset) {
   themeVars = PRESETS[config.themePreset];
   if (!themeVars) fail(`Unknown themePreset "${config.themePreset}". Options: ${Object.keys(PRESETS).join(", ")}.`);
+} else if (pairing) {
+  themeVars = pairing.fallbackTheme;
 }
 if (themeVars) {
   const lines = Object.entries(themeVars)
@@ -282,6 +297,46 @@ if (themeVars) {
     path.join(outDir, "src", "app", "theme.css"),
     `/*\n * Theme tokens. Written by d4-site-builder from the build config.\n * Values are space-separated RGB channels.\n */\n:root {\n${lines}\n}\n`
   );
+}
+
+// ── Pairing: fonts + motion signature ──────────────────────────────────
+// The template ships working defaults for both generated files; when the
+// build config names a pairing, they are rewritten from pairings.json.
+if (pairing) {
+  const fontDecl = (spec, cssVar) =>
+    `${spec.import}({
+  subsets: ["latin"],
+  weight: ${JSON.stringify(spec.weights)},
+  variable: "${cssVar}",
+  display: "swap",
+})`;
+  writeFileSync(
+    path.join(outDir, "src", "config", "fonts.generated.ts"),
+    `/**
+ * GENERATED FILE. Written by d4-site-builder during assembly. Do not edit
+ * by hand; edits are overwritten on reassembly.
+ * Pairing: ${pairing.id} — ${pairing.display.family} / ${pairing.body.family}
+ */
+import { ${pairing.display.import}${pairing.body.import !== pairing.display.import ? `, ${pairing.body.import}` : ""} } from "next/font/google";
+
+export const displayFont = ${fontDecl(pairing.display, "--font-display")};
+
+export const bodyFont = ${fontDecl(pairing.body, "--font-body")};
+`
+  );
+  writeFileSync(
+    path.join(outDir, "src", "config", "design.generated.ts"),
+    `/**
+ * GENERATED FILE. Written by d4-site-builder during assembly. Do not edit
+ * by hand; edits are overwritten on reassembly.
+ */
+export const pairingId = ${JSON.stringify(pairing.id)};
+
+/** Motion signature; the template's motion layer keys off this value. */
+export const motionMode = ${JSON.stringify(pairing.motion)};
+`
+  );
+  console.log(`Applied pairing ${pairing.id} (${pairing.display.family} / ${pairing.body.family}, motion: ${pairing.motion})`);
 }
 
 // ── .env.example ───────────────────────────────────────────────────────
@@ -305,6 +360,7 @@ writeFileSync(
     {
       assembledAt: new Date().toISOString(),
       siteName: config.siteName,
+      pairing: pairing ? pairing.id : null,
       modules: Object.fromEntries(
         ordered.map((n) => [n, manifests.get(n).manifest.version])
       ),

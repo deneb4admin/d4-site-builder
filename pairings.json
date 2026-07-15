@@ -1,0 +1,168 @@
+{
+  "$comment": "The closed menu of design pairing sets. Each pairing bundles a font pairing, a motion signature, and a fallback palette that are KNOWN to work together — agents pick a whole pairing by id, never mix parts from different pairings. Selected via the build config's `pairing` field. An explicit `theme`/`themePreset` in the build config (e.g. from brand ingest) overrides the pairing's fallbackTheme; fonts and motion always come from the pairing. Every fallbackTheme has been validated: all text roles >= 4.5:1 WCAG contrast on both backgrounds, and white on accent >= 4.5:1 for buttons.",
+  "version": 1,
+  "motionModes": {
+    "still": "No scroll animation; one gentle fade on page load. Confident, quiet.",
+    "reveal": "Sections fade + slide up as they scroll into view, standard pace. Versatile default.",
+    "reveal-fast": "Same reveal language at a brisk pace. Feels efficient, energetic.",
+    "reveal-slow": "Same reveal language, slow and gentle. Feels calm, unhurried.",
+    "hover-precision": "Minimal scroll motion; crisp, fast hover/focus states with a subtle lift. Feels tactile and engineered.",
+    "hover-precision-strong": "Hover-precision with a stronger lift and emphasis. Decisive, weighty.",
+    "playful-bounce": "Spring easing with slight overshoot on entrances and hover. Alive, fun.",
+    "ambient-drift": "Slow reveal plus a gentle continuous drift on hero imagery. Atmospheric, editorial."
+  },
+  "pairings": [
+    {
+      "id": "playful-bright",
+      "label": "Playful & Bright",
+      "voice": "Warm, energetic, approachable. The site should feel like a friendly storefront: soft-wonky serif headlines, rounded body text, springy motion, saturated warm color.",
+      "for": "Retail, cafes and food, event planners, family and kids' services, pet businesses — clients who want energy and warmth.",
+      "avoidFor": "Law firms, finance, medical, industrial B2B — reads too casual.",
+      "display": { "family": "Fraunces", "import": "Fraunces", "weights": ["400", "600", "700"], "fallback": "serif" },
+      "body": { "family": "Nunito Sans", "import": "Nunito_Sans", "weights": ["400", "500", "600", "700"], "fallback": "sans-serif" },
+      "motion": "playful-bounce",
+      "fallbackTheme": {
+        "--accent": "194 65 12",
+        "--accent-strong": "154 52 18",
+        "--bg-base": "255 247 237",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "67 20 7",
+        "--text-body": "80 46 28",
+        "--text-muted": "113 66 44"
+      }
+    },
+    {
+      "id": "quiet-luxury",
+      "label": "Quiet Luxury",
+      "voice": "Elegant, restrained, unhurried. High-contrast serif display over an understated grotesk, no scroll animation at all, desaturated neutrals with one bronze accent. Confidence through stillness.",
+      "for": "High-end consultancies, legal, wealth advisors, architecture firms, real estate, boutique agencies — clients selling trust and restraint.",
+      "avoidFor": "Kids' services, discount retail, anything that should feel loud or fun.",
+      "display": { "family": "Cormorant Garamond", "import": "Cormorant_Garamond", "weights": ["400", "600", "700"], "fallback": "serif" },
+      "body": { "family": "Karla", "import": "Karla", "weights": ["400", "500", "600", "700"], "fallback": "sans-serif" },
+      "motion": "still",
+      "fallbackTheme": {
+        "--accent": "120 90 43",
+        "--accent-strong": "92 69 33",
+        "--bg-base": "250 249 246",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "28 25 20",
+        "--text-body": "63 58 50",
+        "--text-muted": "111 103 90"
+      }
+    },
+    {
+      "id": "industrial-confidence",
+      "label": "Industrial Confidence",
+      "voice": "Capable, rugged, precise — not sterile. Condensed structural display type, technical body face, crisp engineered hover states, cool neutrals with a steel-blue accent.",
+      "for": "Manufacturing, engineering, machining, logistics, construction, trades — businesses that make or move physical things.",
+      "avoidFor": "Spas, wellness, luxury retail — reads too utilitarian.",
+      "display": { "family": "Big Shoulders", "import": "Big_Shoulders", "weights": ["400", "600", "700"], "fallback": "sans-serif" },
+      "body": { "family": "IBM Plex Sans", "import": "IBM_Plex_Sans", "weights": ["400", "500", "600", "700"], "fallback": "sans-serif" },
+      "motion": "hover-precision",
+      "fallbackTheme": {
+        "--accent": "29 78 137",
+        "--accent-strong": "22 58 102",
+        "--bg-base": "243 246 249",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "22 28 36",
+        "--text-body": "52 63 75",
+        "--text-muted": "90 103 118"
+      }
+    },
+    {
+      "id": "warm-craft",
+      "label": "Warm Craft",
+      "voice": "Honest, handmade, rooted. Literary warm serif headlines, humanist body text, a standard unhurried reveal, earthy muted tones. Feels like a family business that cares.",
+      "for": "Artisans, home services, farms and food producers, family-owned local businesses, woodworkers, landscapers.",
+      "avoidFor": "Tech startups, corporate B2B — reads too rustic.",
+      "display": { "family": "Lora", "import": "Lora", "weights": ["400", "600", "700"], "fallback": "serif" },
+      "body": { "family": "Work Sans", "import": "Work_Sans", "weights": ["400", "500", "600", "700"], "fallback": "sans-serif" },
+      "motion": "reveal",
+      "fallbackTheme": {
+        "--accent": "133 72 24",
+        "--accent-strong": "105 56 18",
+        "--bg-base": "250 246 240",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "44 33 22",
+        "--text-body": "85 66 48",
+        "--text-muted": "122 99 77"
+      }
+    },
+    {
+      "id": "modern-signal",
+      "label": "Modern Signal",
+      "voice": "Clean, fast, current. Geometric crisp display type, a modern grotesk body, brisk reveals, high-contrast neutrals with one saturated signal accent. The safe-but-sharp default.",
+      "for": "Startups, SaaS, tech-adjacent services, modern professional services, agencies. Also the DEFAULT when no direction is given.",
+      "avoidFor": "Nothing strongly — this is the most neutral pairing; prefer a more characterful one when the client's answers point somewhere specific.",
+      "display": { "family": "Sora", "import": "Sora", "weights": ["400", "600", "700"], "fallback": "sans-serif" },
+      "body": { "family": "Manrope", "import": "Manrope", "weights": ["400", "500", "600", "700"], "fallback": "sans-serif" },
+      "motion": "reveal-fast",
+      "fallbackTheme": {
+        "--accent": "67 56 202",
+        "--accent-strong": "55 48 163",
+        "--bg-base": "250 250 252",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "17 24 39",
+        "--text-body": "55 65 81",
+        "--text-muted": "100 108 126"
+      }
+    },
+    {
+      "id": "editorial-voice",
+      "label": "Editorial Voice",
+      "voice": "Considered, literate, atmospheric. Journalistic serif headlines, quiet readable body, slow ambient drift on hero imagery, ink neutrals with a deep-red accent. Content is the hero.",
+      "for": "Media, publishers, nonprofits, thought-leadership brands, writers, research and policy organizations.",
+      "avoidFor": "Trades and industrial businesses — reads too literary.",
+      "display": { "family": "Newsreader", "import": "Newsreader", "weights": ["400", "600", "700"], "fallback": "serif" },
+      "body": { "family": "Source Sans 3", "import": "Source_Sans_3", "weights": ["400", "500", "600", "700"], "fallback": "sans-serif" },
+      "motion": "ambient-drift",
+      "fallbackTheme": {
+        "--accent": "153 27 27",
+        "--accent-strong": "127 29 29",
+        "--bg-base": "251 250 248",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "28 25 23",
+        "--text-body": "64 60 55",
+        "--text-muted": "113 106 98"
+      }
+    },
+    {
+      "id": "bold-authority",
+      "label": "Bold Authority",
+      "voice": "Decisive, established, substantial. Confident upright condensed display, matched clean body face, strong deliberate hover emphasis, deep navy and charcoal. Gravitas without stuffiness.",
+      "for": "Finance, insurance, B2B services, commercial real estate, established firms that lead with credibility.",
+      "avoidFor": "Playful consumer brands, artisans — reads too corporate.",
+      "display": { "family": "Barlow Semi Condensed", "import": "Barlow_Semi_Condensed", "weights": ["500", "600", "700"], "fallback": "sans-serif" },
+      "body": { "family": "Barlow", "import": "Barlow", "weights": ["400", "500", "600"], "fallback": "sans-serif" },
+      "motion": "hover-precision-strong",
+      "fallbackTheme": {
+        "--accent": "30 58 138",
+        "--accent-strong": "23 37 84",
+        "--bg-base": "246 248 251",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "15 23 42",
+        "--text-body": "51 65 85",
+        "--text-muted": "98 112 131"
+      }
+    },
+    {
+      "id": "calm-wellness",
+      "label": "Calm Wellness",
+      "voice": "Gentle, spacious, reassuring. Quiet legible serif headlines, soft rounded body text, slow gentle reveals, low-saturation cool greens and neutrals. The site should lower the visitor's heart rate.",
+      "for": "Spas, wellness practices, therapists, healthcare-adjacent services, yoga studios, coaching practices.",
+      "avoidFor": "Industrial, logistics, finance — reads too soft.",
+      "display": { "family": "Spectral", "import": "Spectral", "weights": ["400", "600", "700"], "fallback": "serif" },
+      "body": { "family": "Mulish", "import": "Mulish", "weights": ["400", "500", "600", "700"], "fallback": "sans-serif" },
+      "motion": "reveal-slow",
+      "fallbackTheme": {
+        "--accent": "17 94 89",
+        "--accent-strong": "19 78 74",
+        "--bg-base": "245 250 249",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "25 40 38",
+        "--text-body": "58 79 76",
+        "--text-muted": "92 113 109"
+      }
+    }
+  ]
+}
