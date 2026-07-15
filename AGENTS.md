@@ -33,6 +33,12 @@ Copy `examples/build.example.json` and fill it in with the client's facts and mo
 
 Theme: an explicit `theme` object (e.g. from brand ingest of the client's real colors) or a `themePreset` (`slate-teal`, `warm-sand`, `ink-indigo`) overrides the pairing's fallback palette. When neither is given, the pairing's own validated palette applies. Fonts and motion always come from the pairing regardless of theme.
 
+**Dark mode:** ships automatically with a contrast-validated dark palette whenever the palette source has one (every pairing and preset does). A custom `theme` without a matching `themeDark` object ships light-only — never invent dark palette values; they must pass `bin/validate-contrast.mjs`. Set `darkMode: false` to force light-only.
+
+**Navigation (optional `nav` object):** `nav.base` and `nav.tail` are arrays of nav items (`label`, `href`, optional `description`, optional `children`, nested at most two levels below the top). An item WITH children renders as a full-width mega-menu panel in the header (children with their own children add a category rail); items without children render as plain links. When `nav` is omitted the default Home/About + Contact structure applies, and module nav entries are always appended between base and tail. Only link to routes that will exist (module routes are in each manifest's `provides.routes`; `/` `/about` `/contact` always exist).
+
+**Announcement / quote / social (optional):** `announcement` (`text`, optional `href` + `linkLabel`) renders a dismissible bar above the header — omit it entirely unless the client asked for one. `quote` (`enabled`, default true; `topics` array fills the modal's subject select) drives the site-wide quote-request modal; disable it for clients who don't sell quotable work and the CTAs become contact links. `socialLinks` (`label` + `href`) renders footer icons for LinkedIn, Facebook, X, Instagram, and YouTube by label.
+
 ## Assemble
 
 ```
@@ -44,7 +50,7 @@ Options:
 
 The script fails loudly and makes no partial output directory on config errors. If it fails, read the message, fix the config, and rerun. Do not hand-patch a partial assembly.
 
-What it does, in order: resolves modules plus required dependencies, checks route and panel conflicts, copies each module's `files/` payload in registry order, merges npm dependencies into `package.json`, generates `src/config/nav.generated.ts` and `src/config/admin-panels.generated.tsx`, writes `src/config/site.ts` from your config, writes `src/app/theme.css` if a theme was chosen, writes `.env.example`, and records `d4.assembly.json`.
+What it does, in order: resolves modules plus required dependencies, checks route and panel conflicts, copies each module's `files/` payload in registry order, merges npm dependencies into `package.json`, generates `src/config/nav.generated.ts` and `src/config/admin-panels.generated.tsx`, writes `src/config/site.ts` (identity, nav structure, announcement, quote config, social links) from your config, writes `src/app/theme.css` (light block plus a `.dark` block when a validated dark palette exists) and `src/config/design.generated.ts` (pairing id, motion, darkMode flag), writes `.env.example`, and records `d4.assembly.json`.
 
 ## Configure the environment
 

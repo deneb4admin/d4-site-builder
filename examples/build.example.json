@@ -1,5 +1,5 @@
 {
-  "$comment": "Example build config for d4-site-builder. Run: node bin/assemble.mjs --config this-file.json",
+  "$comment": "Example build config for d4-site-builder. Run: node bin/assemble.mjs --config this-file.json. Optional fields shown here: nav (base/tail item trees; items with children render as mega-menu panels, two levels of nesting max), announcement (bar above the header), quote (site-wide quote modal; enabled defaults to true), socialLinks (footer icons), darkMode (set false to disable the dark theme even when the palette has a dark variant), themeDark (dark palette for a custom `theme`; without it a custom theme ships light-only).",
   "siteName": "Acme Fabrication",
   "tagline": "Precision metal fabrication for the Midwest.",
   "description": "Acme Fabrication delivers custom metal work for industrial clients across the region, from one-off prototypes to production runs.",
@@ -7,6 +7,32 @@
   "phone": "(555) 555-0100",
   "address": "100 Industrial Way, Springfield",
   "pairing": "industrial-confidence",
+  "nav": {
+    "base": [
+      { "label": "Home", "href": "/" },
+      {
+        "label": "Services",
+        "href": "/about",
+        "description": "Custom fabrication services for industrial clients across the Midwest.",
+        "children": [
+          { "label": "Prototyping", "href": "/about", "description": "One-off prototypes machined to spec." },
+          { "label": "Production runs", "href": "/about", "description": "Repeatable production with QA on every batch." }
+        ]
+      },
+      { "label": "About", "href": "/about" }
+    ],
+    "tail": [{ "label": "Contact", "href": "/contact" }]
+  },
+  "announcement": {
+    "text": "Now booking Q4 production slots.",
+    "href": "/contact",
+    "linkLabel": "Get a quote"
+  },
+  "quote": {
+    "enabled": true,
+    "topics": ["Prototyping", "Production run", "General inquiry"]
+  },
+  "socialLinks": [{ "label": "LinkedIn", "href": "https://www.linkedin.com/company/example" }],
   "modules": ["d4-cms-core", "d4-careers-portal", "d4-gallery-editor"],
   "output": "./acme-fabrication"
 }

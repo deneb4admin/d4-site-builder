@@ -1,6 +1,6 @@
 {
-  "$comment": "The closed menu of design pairing sets. Each pairing bundles a font pairing, a motion signature, and a fallback palette that are KNOWN to work together — agents pick a whole pairing by id, never mix parts from different pairings. Selected via the build config's `pairing` field. An explicit `theme`/`themePreset` in the build config (e.g. from brand ingest) overrides the pairing's fallbackTheme; fonts and motion always come from the pairing. Every fallbackTheme has been validated: all text roles >= 4.5:1 WCAG contrast on both backgrounds, and white on accent >= 4.5:1 for buttons.",
-  "version": 1,
+  "$comment": "The closed menu of design pairing sets. Each pairing bundles a font pairing, a motion signature, and fallback palettes (light + dark) that are KNOWN to work together — agents pick a whole pairing by id, never mix parts from different pairings. Selected via the build config's `pairing` field. An explicit `theme`/`themePreset` in the build config (e.g. from brand ingest) overrides the pairing's fallbackTheme; fonts and motion always come from the pairing. fallbackThemeDark is the palette behind the site's dark mode: --accent flips to a light readable tint and --accent-contrast (the text color on accent fills) flips to a near-black ink. Every palette is validated by bin/validate-contrast.mjs — all text roles >= 4.5:1 WCAG contrast on both backgrounds, dark-mode accents >= 4.5:1 as text on both dark backgrounds, and --accent-contrast >= 4.5:1 on both accents. Run the validator after ANY palette edit.",
+  "version": 2,
   "motionModes": {
     "still": "No scroll animation; one gentle fade on page load. Confident, quiet.",
     "reveal": "Sections fade + slide up as they scroll into view, standard pace. Versatile default.",
@@ -24,11 +24,22 @@
       "fallbackTheme": {
         "--accent": "194 65 12",
         "--accent-strong": "154 52 18",
+        "--accent-contrast": "255 255 255",
         "--bg-base": "255 247 237",
         "--bg-surface": "255 255 255",
         "--text-heading": "67 20 7",
         "--text-body": "80 46 28",
         "--text-muted": "113 66 44"
+      },
+      "fallbackThemeDark": {
+        "--accent": "251 146 60",
+        "--accent-strong": "253 186 116",
+        "--accent-contrast": "40 18 8",
+        "--bg-base": "24 16 12",
+        "--bg-surface": "34 24 18",
+        "--text-heading": "250 240 233",
+        "--text-body": "214 196 184",
+        "--text-muted": "170 147 132"
       }
     },
     {
@@ -43,11 +54,22 @@
       "fallbackTheme": {
         "--accent": "120 90 43",
         "--accent-strong": "92 69 33",
+        "--accent-contrast": "255 255 255",
         "--bg-base": "250 249 246",
         "--bg-surface": "255 255 255",
         "--text-heading": "28 25 20",
         "--text-body": "63 58 50",
         "--text-muted": "111 103 90"
+      },
+      "fallbackThemeDark": {
+        "--accent": "203 172 116",
+        "--accent-strong": "221 194 147",
+        "--accent-contrast": "30 24 14",
+        "--bg-base": "22 20 17",
+        "--bg-surface": "31 29 25",
+        "--text-heading": "243 240 233",
+        "--text-body": "209 203 191",
+        "--text-muted": "163 155 140"
       }
     },
     {
@@ -62,11 +84,22 @@
       "fallbackTheme": {
         "--accent": "29 78 137",
         "--accent-strong": "22 58 102",
+        "--accent-contrast": "255 255 255",
         "--bg-base": "243 246 249",
         "--bg-surface": "255 255 255",
         "--text-heading": "22 28 36",
         "--text-body": "52 63 75",
         "--text-muted": "90 103 118"
+      },
+      "fallbackThemeDark": {
+        "--accent": "119 170 224",
+        "--accent-strong": "152 192 235",
+        "--accent-contrast": "10 20 32",
+        "--bg-base": "15 18 22",
+        "--bg-surface": "24 29 35",
+        "--text-heading": "236 241 246",
+        "--text-body": "197 206 215",
+        "--text-muted": "148 160 173"
       }
     },
     {
@@ -81,11 +114,22 @@
       "fallbackTheme": {
         "--accent": "133 72 24",
         "--accent-strong": "105 56 18",
+        "--accent-contrast": "255 255 255",
         "--bg-base": "250 246 240",
         "--bg-surface": "255 255 255",
         "--text-heading": "44 33 22",
         "--text-body": "85 66 48",
         "--text-muted": "122 99 77"
+      },
+      "fallbackThemeDark": {
+        "--accent": "226 168 107",
+        "--accent-strong": "237 190 139",
+        "--accent-contrast": "36 24 12",
+        "--bg-base": "25 19 14",
+        "--bg-surface": "35 28 21",
+        "--text-heading": "246 240 232",
+        "--text-body": "212 199 185",
+        "--text-muted": "166 151 134"
       }
     },
     {
@@ -100,11 +144,22 @@
       "fallbackTheme": {
         "--accent": "67 56 202",
         "--accent-strong": "55 48 163",
+        "--accent-contrast": "255 255 255",
         "--bg-base": "250 250 252",
         "--bg-surface": "255 255 255",
         "--text-heading": "17 24 39",
         "--text-body": "55 65 81",
         "--text-muted": "100 108 126"
+      },
+      "fallbackThemeDark": {
+        "--accent": "159 153 255",
+        "--accent-strong": "185 181 255",
+        "--accent-contrast": "18 16 40",
+        "--bg-base": "16 17 23",
+        "--bg-surface": "24 25 33",
+        "--text-heading": "238 239 245",
+        "--text-body": "200 203 214",
+        "--text-muted": "150 154 170"
       }
     },
     {
@@ -119,11 +174,22 @@
       "fallbackTheme": {
         "--accent": "153 27 27",
         "--accent-strong": "127 29 29",
+        "--accent-contrast": "255 255 255",
         "--bg-base": "251 250 248",
         "--bg-surface": "255 255 255",
         "--text-heading": "28 25 23",
         "--text-body": "64 60 55",
         "--text-muted": "113 106 98"
+      },
+      "fallbackThemeDark": {
+        "--accent": "244 152 145",
+        "--accent-strong": "249 180 174",
+        "--accent-contrast": "42 12 10",
+        "--bg-base": "22 18 17",
+        "--bg-surface": "31 26 24",
+        "--text-heading": "244 239 236",
+        "--text-body": "209 200 195",
+        "--text-muted": "161 151 145"
       }
     },
     {
@@ -138,11 +204,22 @@
       "fallbackTheme": {
         "--accent": "30 58 138",
         "--accent-strong": "23 37 84",
+        "--accent-contrast": "255 255 255",
         "--bg-base": "246 248 251",
         "--bg-surface": "255 255 255",
         "--text-heading": "15 23 42",
         "--text-body": "51 65 85",
         "--text-muted": "98 112 131"
+      },
+      "fallbackThemeDark": {
+        "--accent": "137 170 255",
+        "--accent-strong": "168 192 255",
+        "--accent-contrast": "8 16 36",
+        "--bg-base": "14 17 24",
+        "--bg-surface": "22 26 36",
+        "--text-heading": "236 240 247",
+        "--text-body": "198 205 217",
+        "--text-muted": "148 158 175"
       }
     },
     {
@@ -157,11 +234,22 @@
       "fallbackTheme": {
         "--accent": "17 94 89",
         "--accent-strong": "19 78 74",
+        "--accent-contrast": "255 255 255",
         "--bg-base": "245 250 249",
         "--bg-surface": "255 255 255",
         "--text-heading": "25 40 38",
         "--text-body": "58 79 76",
         "--text-muted": "92 113 109"
+      },
+      "fallbackThemeDark": {
+        "--accent": "96 196 185",
+        "--accent-strong": "134 214 204",
+        "--accent-contrast": "6 26 24",
+        "--bg-base": "14 20 19",
+        "--bg-surface": "22 30 28",
+        "--text-heading": "235 243 241",
+        "--text-body": "196 210 206",
+        "--text-muted": "145 163 158"
       }
     }
   ]

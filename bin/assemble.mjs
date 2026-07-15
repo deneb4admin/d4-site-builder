@@ -54,6 +54,7 @@ const modulesDir = argValue("--modules-dir");
 const config = readJson(path.resolve(configPath), "Build config");
 const registry = readJson(path.join(ROOT, "registry.json"), "registry.json");
 const pairingsFile = readJson(path.join(ROOT, "pairings.json"), "pairings.json");
+const presetsFile = readJson(path.join(ROOT, "presets.json"), "presets.json");
 
 let pairing = null;
 if (config.pairing) {
@@ -70,6 +71,97 @@ if (config.pairing) {
 const outDir = path.resolve(config.output ?? fail("Build config needs \"output\": a directory path."));
 if (!config.siteName) fail('Build config needs "siteName".');
 if (!Array.isArray(config.modules)) fail('Build config needs "modules": an array of module names.');
+
+// ── Validate optional shell config (before any output is created) ──────
+// Nav structure: items may nest (children) and carry descriptions; the
+// template renders groups with children as mega-menu panels. Closed shape:
+// anything unrecognized fails the build.
+function validateNav(items, where, depth = 0) {
+  if (!Array.isArray(items)) fail(`${where} must be an array of nav items.`);
+  if (depth > 2) fail(`${where}: nav nests at most two levels below the top (group > child > sub).`);
+  return items.map((item) => {
+    if (typeof item?.label !== "string" || !item.label.trim()) {
+      fail(`${where}: every nav item needs a non-empty string "label".`);
+    }
+    if (typeof item?.href !== "string" || !/^(\/|https?:\/\/)/.test(item.href)) {
+      fail(`${where} "${item.label}": "href" must start with "/" or be an absolute http(s) URL.`);
+    }
+    const known = { label: item.label, href: item.href };
+    if (item.description !== undefined) {
+      if (typeof item.description !== "string") fail(`${where} "${item.label}": "description" must be a string.`);
+      known.description = item.description;
+    }
+    if (item.children !== undefined) {
+      known.children = validateNav(item.children, `${where} "${item.label}" children`, depth + 1);
+    }
+    const extra = Object.keys(item).filter((k) => !["label", "href", "description", "children"].includes(k));
+    if (extra.length) fail(`${where} "${item.label}": unknown nav item field(s): ${extra.join(", ")}.`);
+    return known;
+  });
+}
+const baseNav = config.nav?.base
+  ? validateNav(config.nav.base, 'nav.base')
+  : [
+      { label: "Home", href: "/" },
+      { label: "About", href: "/about" },
+    ];
+const tailNav = config.nav?.tail
+  ? validateNav(config.nav.tail, 'nav.tail')
+  : [{ label: "Contact", href: "/contact" }];
+
+// Optional announcement bar (config-gated; null = hidden).
+let announcement = null;
+if (config.announcement) {
+  if (typeof config.announcement.text !== "string" || !config.announcement.text.trim()) {
+    fail('announcement needs a non-empty "text".');
+  }
+  announcement = { text: config.announcement.text };
+  if (config.announcement.href) announcement.href = String(config.announcement.href);
+  if (config.announcement.linkLabel) announcement.linkLabel = String(config.announcement.linkLabel);
+}
+
+// Quote-request modal config; enabled by default.
+const quote = {
+  enabled: config.quote?.enabled !== false,
+  topics: Array.isArray(config.quote?.topics) ? config.quote.topics.map(String) : [],
+};
+
+// Footer social links.
+const socialLinks = Array.isArray(config.socialLinks)
+  ? config.socialLinks.map((s) => {
+      if (typeof s?.label !== "string" || typeof s?.href !== "string") {
+        fail('socialLinks entries need string "label" and "href".');
+      }
+      return { label: s.label, href: s.href };
+    })
+  : [];
+
+// Theme resolution (validated here, written after payload copy).
+// Light palette priority: explicit theme > themePreset > pairing fallback.
+// Dark palette priority: explicit themeDark > preset dark > pairing dark —
+// but a custom light theme (e.g. brand ingest) without an explicit themeDark
+// gets NO dark block: dark mode only ships with a palette that was
+// contrast-validated against that palette source (bin/validate-contrast.mjs).
+// config.darkMode === false disables dark mode regardless.
+const PRESETS = presetsFile.presets;
+let themeVars = null;
+let darkVars = null;
+if (config.theme && typeof config.theme === "object") {
+  themeVars = { ...config.theme };
+  if (config.themeDark && typeof config.themeDark === "object") darkVars = { ...config.themeDark };
+} else if (config.themePreset) {
+  const preset = PRESETS[config.themePreset];
+  if (!preset) fail(`Unknown themePreset "${config.themePreset}". Options: ${Object.keys(PRESETS).join(", ")}.`);
+  themeVars = { ...preset.light };
+  darkVars = { ...preset.dark };
+} else if (pairing) {
+  themeVars = { ...pairing.fallbackTheme };
+  darkVars = pairing.fallbackThemeDark ? { ...pairing.fallbackThemeDark } : null;
+}
+if (config.darkMode === false) darkVars = null;
+// With no theme override at all, the template's checked-in default stands
+// (modern-signal light + validated dark), so dark mode defaults to on.
+const darkMode = themeVars ? Boolean(darkVars) : config.darkMode !== false;
 
 const registryByName = new Map(registry.modules.map((m) => [m.name, m]));
 
@@ -230,78 +322,56 @@ const site = {
   phone: config.phone ?? "",
   address: config.address ?? "",
 };
+
 writeFileSync(
   path.join(outDir, "src", "config", "site.ts"),
-  `import type { NavItem } from "@/types";
+  `import type { Announcement, NavItem, QuoteConfig, SocialLink } from "@/types";
 
 /**
  * Site identity. Written by d4-site-builder from the build config.
  */
 export const siteConfig = ${JSON.stringify(site, null, 2)};
 
-/** Base navigation. Module nav entries are appended after these. */
-export const baseNav: NavItem[] = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-];
+/**
+ * Base navigation. Module nav entries are appended after these. Items with
+ * children render as mega-menu groups; flat items as plain links.
+ */
+export const baseNav: NavItem[] = ${JSON.stringify(baseNav, null, 2)};
 
 /** Nav entries pinned to the end (after module entries). */
-export const tailNav: NavItem[] = [{ label: "Contact", href: "/contact" }];
+export const tailNav: NavItem[] = ${JSON.stringify(tailNav, null, 2)};
+
+/** Optional announcement bar above the header; null = hidden. */
+export const announcement: Announcement | null = ${JSON.stringify(announcement, null, 2)};
+
+/** Quote-request modal; when disabled, quote CTAs link to /contact instead. */
+export const quoteConfig: QuoteConfig = ${JSON.stringify(quote, null, 2)};
+
+/** Social profiles shown in the footer; empty = hidden. */
+export const socialLinks: SocialLink[] = ${JSON.stringify(socialLinks, null, 2)};
 `
 );
 
-// ── Theme ──────────────────────────────────────────────────────────────
-const PRESETS = {
-  "slate-teal": {
-    "--accent": "15 118 110",
-    "--accent-strong": "17 94 89",
-    "--bg-base": "248 250 252",
-    "--bg-surface": "255 255 255",
-    "--text-heading": "15 23 42",
-    "--text-body": "51 65 85",
-    "--text-muted": "100 116 139",
-  },
-  "warm-sand": {
-    "--accent": "180 99 42",
-    "--accent-strong": "146 78 32",
-    "--bg-base": "250 246 240",
-    "--bg-surface": "255 255 255",
-    "--text-heading": "35 26 18",
-    "--text-body": "77 62 48",
-    "--text-muted": "128 108 90",
-  },
-  "ink-indigo": {
-    "--accent": "79 70 229",
-    "--accent-strong": "67 56 202",
-    "--bg-base": "250 250 252",
-    "--bg-surface": "255 255 255",
-    "--text-heading": "17 24 39",
-    "--text-body": "55 65 81",
-    "--text-muted": "107 114 128",
-  },
-};
-let themeVars = null;
-if (config.theme && typeof config.theme === "object") {
-  themeVars = config.theme;
-} else if (config.themePreset) {
-  themeVars = PRESETS[config.themePreset];
-  if (!themeVars) fail(`Unknown themePreset "${config.themePreset}". Options: ${Object.keys(PRESETS).join(", ")}.`);
-} else if (pairing) {
-  themeVars = pairing.fallbackTheme;
-}
+// ── Theme (resolved and validated up top; written here) ────────────────
 if (themeVars) {
-  const lines = Object.entries(themeVars)
-    .map(([k, v]) => `  ${k}: ${v};`)
-    .join("\n");
+  // Text color on accent fills; custom themes predating the token get white.
+  if (!themeVars["--accent-contrast"]) themeVars["--accent-contrast"] = "255 255 255";
+  const block = (vars) =>
+    Object.entries(vars)
+      .map(([k, v]) => `  ${k}: ${v};`)
+      .join("\n");
+  const dark = darkVars ? `\n\n.dark {\n  color-scheme: dark;\n${block(darkVars)}\n}` : "";
   writeFileSync(
     path.join(outDir, "src", "app", "theme.css"),
-    `/*\n * Theme tokens. Written by d4-site-builder from the build config.\n * Values are space-separated RGB channels.\n */\n:root {\n${lines}\n}\n`
+    `/*\n * Theme tokens. Written by d4-site-builder from the build config.\n * Values are space-separated RGB channels.\n */\n:root {\n  color-scheme: light;\n${block(themeVars)}\n}${dark}\n`
   );
 }
 
-// ── Pairing: fonts + motion signature ──────────────────────────────────
-// The template ships working defaults for both generated files; when the
-// build config names a pairing, they are rewritten from pairings.json.
+// ── Pairing: fonts + motion signature + dark-mode flag ─────────────────
+// The template ships working defaults for the generated files; when the
+// build config names a pairing, fonts + motion are rewritten from
+// pairings.json. design.generated.ts is also rewritten whenever the theme
+// changed, so the darkMode flag always matches what theme.css carries.
 if (pairing) {
   const fontDecl = (spec, cssVar) =>
     `${spec.import}({
@@ -324,19 +394,34 @@ export const displayFont = ${fontDecl(pairing.display, "--font-display")};
 export const bodyFont = ${fontDecl(pairing.body, "--font-body")};
 `
   );
+}
+if (pairing || themeVars || config.darkMode === false) {
   writeFileSync(
     path.join(outDir, "src", "config", "design.generated.ts"),
     `/**
  * GENERATED FILE. Written by d4-site-builder during assembly. Do not edit
  * by hand; edits are overwritten on reassembly.
  */
-export const pairingId = ${JSON.stringify(pairing.id)};
+export const pairingId = ${JSON.stringify(pairing ? pairing.id : "modern-signal")};
 
 /** Motion signature; the template's motion layer keys off this value. */
-export const motionMode = ${JSON.stringify(pairing.motion)};
+export const motionMode = ${JSON.stringify(pairing ? pairing.motion : "reveal-fast")};
+
+/**
+ * True when theme.css carries a validated .dark palette. Gates the header
+ * theme toggle and the early theme script; with no dark palette the site is
+ * permanently light and no toggle renders.
+ */
+export const darkMode = ${JSON.stringify(darkMode)};
 `
   );
-  console.log(`Applied pairing ${pairing.id} (${pairing.display.family} / ${pairing.body.family}, motion: ${pairing.motion})`);
+}
+if (pairing) {
+  console.log(
+    `Applied pairing ${pairing.id} (${pairing.display.family} / ${pairing.body.family}, motion: ${pairing.motion}, dark mode: ${darkMode ? "on" : "off"})`
+  );
+} else if (themeVars) {
+  console.log(`Applied theme (${config.themePreset ? `preset ${config.themePreset}` : "custom"}, dark mode: ${darkMode ? "on" : "off"})`);
 }
 
 // ── .env.example ───────────────────────────────────────────────────────
@@ -361,6 +446,7 @@ writeFileSync(
       assembledAt: new Date().toISOString(),
       siteName: config.siteName,
       pairing: pairing ? pairing.id : null,
+      darkMode,
       modules: Object.fromEntries(
         ordered.map((n) => [n, manifests.get(n).manifest.version])
       ),

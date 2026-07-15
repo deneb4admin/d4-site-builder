@@ -1,0 +1,71 @@
+{
+  "$comment": "Named theme presets selectable via the build config's `themePreset` field. Each preset has a light palette and a dark counterpart; the assembler writes the light palette into :root and the dark one into a .dark block in theme.css. Values are space-separated RGB channels. --accent-contrast is the text color used ON accent fills (buttons); in light palettes it is white, in dark palettes a near-black ink, so accent itself can be a light readable tint in dark mode. Run bin/validate-contrast.mjs after any edit: every palette must keep all text roles and both accents >= 4.5:1 WCAG contrast on both backgrounds, and --accent-contrast >= 4.5:1 on both accents.",
+  "presets": {
+    "slate-teal": {
+      "light": {
+        "--accent": "15 118 110",
+        "--accent-strong": "17 94 89",
+        "--accent-contrast": "255 255 255",
+        "--bg-base": "248 250 252",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "15 23 42",
+        "--text-body": "51 65 85",
+        "--text-muted": "100 116 139"
+      },
+      "dark": {
+        "--accent": "45 212 191",
+        "--accent-strong": "94 234 212",
+        "--accent-contrast": "4 30 28",
+        "--bg-base": "15 20 26",
+        "--bg-surface": "23 30 38",
+        "--text-heading": "236 242 247",
+        "--text-body": "199 208 217",
+        "--text-muted": "146 158 170"
+      }
+    },
+    "warm-sand": {
+      "light": {
+        "--accent": "172 92 36",
+        "--accent-strong": "146 78 32",
+        "--accent-contrast": "255 255 255",
+        "--bg-base": "250 246 240",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "35 26 18",
+        "--text-body": "77 62 48",
+        "--text-muted": "128 108 90"
+      },
+      "dark": {
+        "--accent": "233 168 102",
+        "--accent-strong": "243 190 136",
+        "--accent-contrast": "40 24 10",
+        "--bg-base": "26 20 14",
+        "--bg-surface": "36 29 21",
+        "--text-heading": "247 241 233",
+        "--text-body": "213 201 187",
+        "--text-muted": "164 150 133"
+      }
+    },
+    "ink-indigo": {
+      "light": {
+        "--accent": "79 70 229",
+        "--accent-strong": "67 56 202",
+        "--accent-contrast": "255 255 255",
+        "--bg-base": "250 250 252",
+        "--bg-surface": "255 255 255",
+        "--text-heading": "17 24 39",
+        "--text-body": "55 65 81",
+        "--text-muted": "107 114 128"
+      },
+      "dark": {
+        "--accent": "158 152 255",
+        "--accent-strong": "184 180 255",
+        "--accent-contrast": "18 16 40",
+        "--bg-base": "16 17 23",
+        "--bg-surface": "24 25 33",
+        "--text-heading": "238 239 245",
+        "--text-body": "200 203 214",
+        "--text-muted": "148 152 168"
+      }
+    }
+  }
+}
