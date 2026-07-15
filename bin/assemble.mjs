@@ -136,6 +136,39 @@ const socialLinks = Array.isArray(config.socialLinks)
     })
   : [];
 
+// Home page FAQ section (hidden when empty).
+const faq = Array.isArray(config.faq)
+  ? config.faq.map((f) => {
+      if (typeof f?.q !== "string" || !f.q.trim() || typeof f?.a !== "string" || !f.a.trim()) {
+        fail('faq entries need non-empty string "q" and "a".');
+      }
+      return { q: f.q, a: f.a };
+    })
+  : [];
+if (faq.length > 12) fail(`faq has ${faq.length} entries; cap is 12 — a FAQ longer than that belongs on its own page.`);
+
+// Home page logo strip (hidden when items is empty).
+let logoWall = { items: [] };
+if (config.logoWall) {
+  if (!Array.isArray(config.logoWall.items)) fail('logoWall needs an "items" array.');
+  logoWall = {
+    ...(config.logoWall.title ? { title: String(config.logoWall.title) } : {}),
+    items: config.logoWall.items.map((it) => {
+      if (typeof it?.name !== "string" || !it.name.trim()) {
+        fail('logoWall items need a non-empty string "name".');
+      }
+      const entry = { name: it.name };
+      if (it.src) entry.src = String(it.src);
+      if (it.subtitle) entry.subtitle = String(it.subtitle);
+      if (it.size !== undefined) {
+        if (!["sm", "md", "lg"].includes(it.size)) fail(`logoWall "${it.name}": size must be sm, md, or lg.`);
+        entry.size = it.size;
+      }
+      return entry;
+    }),
+  };
+}
+
 // Theme resolution (validated here, written after payload copy).
 // Light palette priority: explicit theme > themePreset > pairing fallback.
 // Dark palette priority: explicit themeDark > preset dark > pairing dark —
@@ -325,7 +358,7 @@ const site = {
 
 writeFileSync(
   path.join(outDir, "src", "config", "site.ts"),
-  `import type { Announcement, NavItem, QuoteConfig, SocialLink } from "@/types";
+  `import type { Announcement, FaqItem, LogoWall, NavItem, QuoteConfig, SocialLink } from "@/types";
 
 /**
  * Site identity. Written by d4-site-builder from the build config.
@@ -349,6 +382,12 @@ export const quoteConfig: QuoteConfig = ${JSON.stringify(quote, null, 2)};
 
 /** Social profiles shown in the footer; empty = hidden. */
 export const socialLinks: SocialLink[] = ${JSON.stringify(socialLinks, null, 2)};
+
+/** FAQ entries for the home page; empty = section hidden. */
+export const faq: FaqItem[] = ${JSON.stringify(faq, null, 2)};
+
+/** Client/partner logo strip on the home page; empty items = hidden. */
+export const logoWall: LogoWall = ${JSON.stringify(logoWall, null, 2)};
 `
 );
 

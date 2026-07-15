@@ -37,6 +37,8 @@ Theme: an explicit `theme` object (e.g. from brand ingest of the client's real c
 
 **Navigation (optional `nav` object):** `nav.base` and `nav.tail` are arrays of nav items (`label`, `href`, optional `description`, optional `children`, nested at most two levels below the top). An item WITH children renders as a full-width mega-menu panel in the header (children with their own children add a category rail); items without children render as plain links. When `nav` is omitted the default Home/About + Contact structure applies, and module nav entries are always appended between base and tail. Only link to routes that will exist (module routes are in each manifest's `provides.routes`; `/` `/about` `/contact` always exist).
 
+**Home page sections (optional):** `faq` (array of `{q, a}`, max 12) renders a FAQ accordion section on the home page; `logoWall` (`{title?, items: [{name, src?, subtitle?, size?}]}`) renders a client/partner logo strip after the hero. Both come from real client answers (their actual FAQs, their actual client names) — never invent entries; omit them entirely when the client gave nothing, and the sections simply don't render.
+
 **Announcement / quote / social (optional):** `announcement` (`text`, optional `href` + `linkLabel`) renders a dismissible bar above the header — omit it entirely unless the client asked for one. `quote` (`enabled`, default true; `topics` array fills the modal's subject select) drives the site-wide quote-request modal; disable it for clients who don't sell quotable work and the CTAs become contact links. `socialLinks` (`label` + `href`) renders footer icons for LinkedIn, Facebook, X, Instagram, and YouTube by label.
 
 ## Assemble
